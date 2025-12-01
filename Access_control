@@ -1,0 +1,81 @@
+import speech_recognition as sr
+import pyttsx3
+import datetime 
+
+engine = pyttsx3.init()
+
+# improve voice speed
+engine.setProperty('rate', 150) 
+
+def speak(text):
+    # Speak the text using text-to-speech
+    print(f"Assistant: {text}") # print to console
+    engine.say(text)
+    engine.runAndWait()
+
+def get_audio():
+    # Get audio input from the microphone and convert it to text
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("\nListening")
+        recognizer.adjust_for_ambient_noise(source, duration=0.5)
+        try:
+            audio = recognizer.listen(source, timeout=5)
+            text = recognizer.recognize_google(audio)
+            print(f"You said: {text}")
+            return text.lower()
+        except sr.UnknownValueError:
+            return "Sorry, I did not understand that."
+        except sr.RequestError:
+            speak("Sorry, check your internet connection.")
+            return ""
+
+def main_conversation():
+    speak("Hello! I am ready. You can ask me questions.")
+    
+    while True:
+        text = get_audio()
+        
+        if text == "":
+            continue
+        
+        #Case 1: greeting
+        if "hello" in text or "hi" in text:
+            speak("Hello there! It's good to hear you.")
+
+        #Case 2: asking about well-being
+        elif "how are you" in text:
+            speak("I am just code, but I feel great running on your computer!")
+
+        #Case 3: asking about name
+        elif "your name" in text:
+            speak("I am your Python Assistant created for this assignment.")
+
+        #Case 4: asking about job
+        elif "what do you do" in text or "job" in text:
+            speak("I listen to your voice and try to answer your questions.")
+
+        #Case 5: asking about time (dynamic scenario)
+        elif "time" in text:
+            current_time = datetime.datetime.now().strftime("%I:%M %p")
+            speak(f"The current time is {current_time}")
+
+        #Case 6: asking for a joke or something funny
+        elif "joke" in text or "funny" in text:
+            speak("Why do programmers prefer dark mode? Because light attracts bugs!")
+
+        #Case 7: asking about the developer
+        elif "made you" in text or "creator" in text:
+            speak("I was developed by a smart student.")
+
+        # exit condition (to end the loop) 
+        elif "exit" in text or "bye" in text or "stop" in text:
+            speak("Goodbye! Shutting down now.")
+            break 
+            
+            #Case didn't match any of the above
+        else:
+            speak("I am not sure how to answer that yet.")
+
+if __name__ == "__main__":
+    main_conversation()
